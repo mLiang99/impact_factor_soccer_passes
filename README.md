@@ -1,5 +1,6 @@
-# impact_factpr_soccer_passes
-Quantify passes in football (soccer)
+# Sport Analytics: Modeling the Significance of Soccer Passes 
+By Michael Liang and Liam Sharp
+
 
 ### Resources
 Snippets of code used from Laurie Shaw's: https://github.com/Friends-of-Tracking-Data-FoTD/LaurieOnTracking
