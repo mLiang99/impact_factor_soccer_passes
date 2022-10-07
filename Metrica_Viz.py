@@ -164,6 +164,43 @@ def plot_events(events, figax=None, field_dimen=(106.0, 68), indicators=['Marker
 
     Plots Metrica event positions on a football pitch. event data can be a single or several rows of a data frame. All distances should be in meters.
 
+    Parameters xThreat_Pass
+    -----------
+        events: row (i.e. instant) of the home team tracking data frame
+        fig,ax: Can be used to pass in the (fig,ax) objects of a previously generated pitch. Set to (fig,ax) to use an existing figure, or None (the default) to generate a new pitch plot,
+        field_dimen: tuple containing the length and width of the pitch in meters. Default is (106,68)
+        indicators: List containing choices on how to plot the event. 'Marker' places a marker at the 'Start X/Y' location of the event; 'Arrow' draws an arrow from the start to end locations. Can choose one or both.
+        color: color of indicator. Default is 'r' (red)
+        marker_style: Marker type used to indicate the event position. Default is 'o' (filled ircle).
+        alpha: alpha of event marker. Default is 0.5
+        annotate: Boolean determining whether text annotation from event data 'Type' and 'From' fields is shown on plot. Default is False.
+
+    Returrns
+    -----------
+       fig,ax : figure and aixs objects (so that other data can be plotted onto the pitch)
+    """
+
+    if figax is None:  # create new pitch
+        fig, ax = plot_pitch(field_dimen=field_dimen)
+    else:  # overlay on a previously generated pitch
+        fig, ax = figax
+    for i, row in events.iterrows():
+        if 'Marker' in indicators:
+            ax.plot(row['Start X'], row['Start Y'], color+marker_style, alpha=alpha)
+        if 'Arrow' in indicators:
+            ax.annotate("", xy=row[['End X', 'End Y']], xytext=row[['Start X', 'Start Y']], alpha=alpha, arrowprops=dict(
+                alpha=alpha, width=0.5, headlength=4.0, headwidth=4.0, color=color), annotation_clip=False)
+        if annotate:
+            textstring = str(row['Type_of_Pass'][0].upper()) + ': [ ' + str(round(row['possession_score'], 3)) + '; ' + str(round(row['scoring_score'],3) )+ '; ' + str(round(row['Improved_Impact_Score'],3) ) + " ]"
+            ax.text(row['Start X']+alpha, row['Start Y']+alpha, textstring, fontsize=10, color=color)
+    return fig, ax
+
+
+def plot_events2(events, figax=None, field_dimen=(106.0, 68), indicators=['Marker', 'Arrow'], color='r', marker_style='o', alpha=0.5, annotate=False):
+    """ plot_events( events )
+
+    Plots Metrica event positions on a football pitch. event data can be a single or several rows of a data frame. All distances should be in meters.
+
     Parameters
     -----------
         events: row (i.e. instant) of the home team tracking data frame
@@ -191,6 +228,10 @@ def plot_events(events, figax=None, field_dimen=(106.0, 68), indicators=['Marker
             ax.annotate("", xy=row[['End X', 'End Y']], xytext=row[['Start X', 'Start Y']], alpha=alpha, arrowprops=dict(
                 alpha=alpha, width=0.5, headlength=4.0, headwidth=4.0, color=color), annotation_clip=False)
         if annotate:
-            textstring = row['Type'] + ': ' + row['From'] + '- F1:' + str(row['nbr_crossed_ply'])
+            if row['Type'] != 'PASS': 
+                textstring = ' [ ' + str(row['Subtype'] ) + " ]"
+            else:
+                textstring = ' [ xT: ' + str(round(row['xThreat_Pass'],3) ) + " ]"
             ax.text(row['Start X'], row['Start Y'], textstring, fontsize=10, color=color)
     return fig, ax
+
